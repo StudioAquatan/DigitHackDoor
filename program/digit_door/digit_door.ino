@@ -1,39 +1,44 @@
-int const rs0=12;//リードスイッチ1
-int const rs1=13;//リードスイッチ2
-int const led=5;
-int const button=14;
+#define RS0 12  // リードスイッチ1
+#define RS1 13  // リードスイッチ2
+#define LED 5
+#define BUTTON 14
+
+void ledOn(){
+  digitalWrite(LED, 1);
+}
+void ledOff(){
+  digitalWrite(LED, 0);
+}
 
 void setup() {
-  // put your setup code here, to run once:
-  pinMode(rs0,INPUT_PULLUP);
-  pinMode(rs1,INPUT_PULLUP);
-  pinMode(led,OUTPUT);
-  pinMode(button,INPUT_PULLUP);
+  // pin mode setting
+  pinMode(RS0, INPUT_PULLUP);
+  pinMode(RS1, INPUT_PULLUP);
+  pinMode(LED, OUTPUT);
+  pinMode(BUTTON, INPUT_PULLUP);
+
+  // serial setup
   Serial.begin(115200);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  checkReadSwitch();
+  if(checkReadSwitch()){
+    ledOn();
+  }else{
+    ledOff();
+  }
   delay(1000); 
 }
 
 //リードスイッチの値を確認
-void checkReadSwitch(void){
-  int rs_value0=digitalRead(rs0);
-  int rs_value1=digitalRead(rs1);
-  
-  /*
-  Serial.print(rs_value0);
-  Serial.print(" ");
-  Serial.println(rs_value1);
-  */
+bool checkReadSwitch(){
+  int rs0Val=digitalRead(RS0);
+  int rs1Val=digitalRead(RS1);
 
-  if(!(rs_value1 && rs_value0)){
-    ///ネットワーク処理関数///
-    digitalWrite(led,1);
+  if(!(rs0Val && rs1Val)){
+    return true;
   }else{
-    digitalWrite(led,0);
+    return false;
   }
 }
 
