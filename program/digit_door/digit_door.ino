@@ -13,12 +13,18 @@ void ledOn(){
 void ledOff(){
   digitalWrite(LED, 0);
 }
+void ledToggle(){
+  if(digitalRead(LED)){
+    ledOff();
+  }else{
+    ledOn();
+  }
+}
 
-void ringChaim(){
+void post(){
   Serial.println("ring");
   HTTPClient http;
-  // TODO: ここをactuatorのWebサーバーにする．
-  http.begin("http://192.168.42.1/play?file=chaim.wav");
+  http.begin("http://192.168.42.2/door");
   http.GET();
   http.end();
 }
@@ -41,19 +47,29 @@ void setup() {
   Serial.println("WiFi connecting");
   while(WiFi.status() != WL_CONNECTED){
     Serial.print(".");
-    delay(500);
+    delay(200);
+    ledToggle();
   }
   Serial.println("\nconnected");
 }
 
+int cnt=0;
 void loop() {
   if(checkReadSwitch()){
-    ledOn();
-    ringChaim();
+    cnt++;
+    if(cnt>=10){
+      ledOn();
+      post();
+      while(checkReadSwitch()){
+        delay(50);
+      }
+      cnt=0;
+    }
   }else{
     ledOff();
+    cnt=0;
   }
-  delay(1000); 
+  delay(100); 
 }
 
 //リードスイッチの値を確認
@@ -62,9 +78,9 @@ bool checkReadSwitch(){
   int rs1Val=digitalRead(RS1);
 
   if(!(rs0Val && rs1Val)){
-    return true;
-  }else{
     return false;
+  }else{
+    return true;
   }
 }
 
